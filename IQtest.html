@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>IQ Test</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; background: #f4f4f4; }
+    .question { margin-bottom: 20px; }
+    .question h3 { margin-bottom: 10px; }
+    .answers button { margin: 5px 0; display: block; width: 100%; }
+    #timer { font-size: 20px; color: red; }
+    #results { margin-top: 20px; padding: 10px; background: #fff; border: 1px solid #ccc; }
+    .hidden { display: none; }
+  </style>
+</head>
+<body>
+
+<h1>IQ Test</h1>
+<div id="timer">Time left: 60s</div>
+<div id="quiz"></div>
+<div id="results" class="hidden"></div>
+
+<script>
+const questions = [
+  {
+    question: "Which number comes next? 2, 4, 8, 16, ?",
+    answers: ["18", "20", "32", "30"],
+    correct: "32"
+  },
+  {
+    question: "Which word does NOT belong?",
+    answers: ["Dog", "Cat", "Lion", "Car"],
+    correct: "Car"
+  },
+  {
+    question: "What is 15% of 200?",
+    answers: ["25", "30", "35", "40"],
+    correct: "30"
+  },
+  {
+    question: "Complete the sequence: A, C, F, J, O, ?",
+    answers: ["S", "T", "U", "V"],
+    correct: "U"
+  },
+  {
+    question: "Which shape has the most sides?",
+    answers: ["Triangle", "Pentagon", "Hexagon", "Octagon"],
+    correct: "Octagon"
+  }
+];
+
+let currentQuestion = 0;
+let score = 0;
+let startTime = Date.now();
+let totalTime = 60; // seconds
+let quiz = document.getElementById("quiz");
+let results = document.getElementById("results");
+
+function showQuestion() {
+  if (currentQuestion >= questions.length) return showResults();
+  const q = questions[currentQuestion];
+  quiz.innerHTML = `
+    <div class="question">
+      <h3>Q${currentQuestion + 1}: ${q.question}</h3>
+      <div class="answers">
+        ${q.answers.map(ans => `<button onclick="checkAnswer('${ans}')">${ans}</button>`).join('')}
+      </div>
+    </div>
+  `;
+}
+
+function checkAnswer(selected) {
+  const q = questions[currentQuestion];
+  if (selected === q.correct) score++;
+  currentQuestion++;
+  showQuestion();
+}
+
+function showResults() {
+  clearInterval(timerInterval);
+  quiz.innerHTML = "";
+  const endTime = Date.now();
+  const elapsed = Math.round((endTime - startTime) / 1000);
+  const speedFactor = Math.max(0, (totalTime - elapsed) / totalTime);
+  const iqEstimate = Math.round(80 + (score * 8) + (speedFactor * 20));
+  const brainAge = Math.max(18, 70 - iqEstimate / 2);
+
+  results.innerHTML = `
+    <h2>Test Complete!</h2>
+    <p>Score: ${score} / ${questions.length}</p>
+    <p>Time used: ${elapsed} seconds</p>
+    <p><strong>Estimated IQ: ${iqEstimate}</strong></p>
+    <p><strong>Estimated Brain Age: ${brainAge} years</strong></p>
+  `;
+  results.classList.remove("hidden");
+}
+
+let timerInterval = setInterval(() => {
+  const now = Date.now();
+  const elapsed = Math.round((now - startTime) / 1000);
+  let remaining = totalTime - elapsed;
+  document.getElementById("timer").textContent = `Time left: ${remaining}s`;
+  if (remaining <= 0) {
+    clearInterval(timerInterval);
+    showResults();
+  }
+}, 1000);
+
+showQuestion();
+</script>
+<p type=signature>By:Sasi</p>
+</body>
+</html>
